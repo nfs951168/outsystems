@@ -3,9 +3,9 @@
 -------------------------------------------------------------------------------------------------------------------------------------------------
 select	en.Id, en.name, en.PHYSICAL_TABLE_NAME, en.is_system, en.data_kind, es.NAME as eSpaceName, app.NAME as ApplicationName
 from	ossys_Entity en inner join ossys_espace es on (es.id = en.ESPACE_ID)
-						inner join ossys_module mo on (mo.espace_id = es.id)
-						inner join ossys_app_definition_module adm on (adm.module_id = mo.id)
-                        inner join ossys_application app on (app.id = adm.application_id)
+						innerÂ joinÂ ossys_module moÂ onÂ (mo.espace_id = es.id)
+						innerÂ joinÂ ossys_app_definition_module admÂ onÂ (adm.module_id = mo.id)
+Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â innerÂ joinÂ ossys_application appÂ onÂ (app.id = adm.application_id)
 where	app.name like '%dynamic%'
 and		en.IS_ACTIVE = 1
 
@@ -79,3 +79,15 @@ from    ossys_rest_web_reference wr inner join ossys_espace es on (es.Id = wr.es
 where   wr.is_active = 1
 and     es.Is_Active = 1
 --and     (wr.effective_url like '%dev%' or (wr.url like '%dev%' and wr.effective_url is null))
+
+
+ ------------------------------------------------------------------------------------------------------------------------------------------------
+--References: Get references of given module and object
+--ossys_Espace_Reference: table with all references (producers and consumers)
+-------------------------------------------------------------------------------------------------------------------------------------------------
+SELECT	TOP (1000) ER.[PRODUCER_NAME], ER.[PRODUCER_KIND], E.[NAME], COUNT(1) AS [REFERENCES_COUNT]
+FROM	[ossys_Espace_Reference] ER INNER JOIN [ossys_Espace] E ON (E.VERSION_ID = ER.CONSUMER_VERSION_ID)
+WHERE	ER.[PRODUCER_NAME] = 'OutsystemsUI'
+AND	ER.[NAME] like 'Deprecated%'
+AND	E.IS_ACTIVE = 1
+GROUP BY ER.[PRODUCER_NAME], ER.[PRODUCER_KIND], E.[NAME]
