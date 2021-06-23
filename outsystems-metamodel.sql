@@ -85,9 +85,16 @@ and     es.Is_Active = 1
 --References: Get references of given module and object
 --ossys_Espace_Reference: table with all references (producers and consumers)
 -------------------------------------------------------------------------------------------------------------------------------------------------
-SELECT	TOP (1000) ER.[PRODUCER_NAME] ProducerName, ER.[PRODUCER_KIND] ProducerType, E.[NAME] ConsumerName, COUNT(1) AS [ReferencesCount]
-FROM	[ossys_Espace_Reference] ER INNER JOIN [ossys_Espace] E ON (E.VERSION_ID = ER.CONSUMER_VERSION_ID)
-WHERE	ER.[PRODUCER_NAME] = 'OutsystemsUI'
-AND	ER.[NAME] like 'Deprecated%'
-AND	E.IS_ACTIVE = 1
-GROUP BY ER.[PRODUCER_NAME], ER.[PRODUCER_KIND], E.[NAME]
+select	top (1000) er.[producer_name] as [producer-name],
+		er.[producer_kind] as [producer-type], 
+		e.[name] as [consumer-name], 
+		a.NAME as [application-name],
+		count(1) as [references-count]
+from	ossys_espace_reference er	inner join ossys_espace e on (e.version_id = er.consumer_version_id)
+									inner join ossys_module m on (m.espace_id = e.id)
+									inner join ossys_app_definition_module adm on (adm.module_id = m.id)
+									inner join ossys_application a on (a.id = adm.application_id)
+where	er.[producer_name] = 'outsystemsui'
+and	er.[name] like 'deprecated%'
+and	e.is_active = 1
+group by er.[producer_name], er.[producer_kind], e.[name], a.NAME
