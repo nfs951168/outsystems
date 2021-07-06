@@ -16,8 +16,8 @@ select	instant,
 		action_name, 
 		access_mode, 
 		duration [duration_ms], 
-		viewstate_bytes/8 [viewstate_kb], 
-		session_bytes/8 [session_kb]
+		viewstate_bytes/1024 [viewstate_kb], 
+		session_bytes/1024 [session_kb]
 INTO	#temp_screenlog
 from	oslog_screen_previous;
 
