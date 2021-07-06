@@ -10,16 +10,17 @@ DROP TABLE #TMP_FINAL_LOGS;
 --OSLOG_INTEGRATION_X: ONE LOG TABLE BY WEEK
 -- REQUEST_KEY: AGREGATES ALL CALLS TO CONSUMED SERVICES BY THE SAME ID
 -----------------------------------------------------------------------------------------------------------------------------------------------------------
-SELECT	APPLICATION_NAME, 
-		ESPACE_NAME, 
-		INSTANT, 
-		DURATION, 
-		TYPE, 
-		ENDPOINT, ACTION, 
-		ERROR_ID, 
-		EXECUTED_BY, 
-		IS_EXPOSE, 
-		REQUEST_KEY
+SELECT	Application_Name, 
+		Espace_Name, 
+		Instant, 
+		Duration, 
+		Type, 
+		Endpoint, 
+		Action, 
+		Error_Id, 
+		Executed_by, 
+		Is_Expose, 
+		Request_Key
 INTO	#TMP_INT_LOGS
 FROM	oslog_Integration_Previous;
 
@@ -28,25 +29,26 @@ FROM	oslog_Integration_Previous;
 -----------------------------------------------------------------------------------------------------------------------------------------------------------
 --CALUCLATE METRICS
 -----------------------------------------------------------------------------------------------------------------------------------------------------------
-SELECT	APPLICATION_NAME, ESPACE_NAME, CONVERT(DATE, LG.INSTANT) INSTDATE, CONVERT(TIME, LG.INSTANT) INSTTIME, ENDPOINT, ACTION, DURATION, 
-		CASE WHEN ERROR_ID = '' THEN 0 ELSE 1 END HAS_ERROR
-INTO	#TMP_FINAL_LOGS
-FROM	#TMP_INT_LOGS LG;
+select	application_name, espace_name, convert(date, lg.instant) instdate, convert(time, lg.instant) insttime, endpoint, action, duration, 
+		case when error_id = '' then 0 else 1 end has_error
+into	#tmp_final_logs
+from	#tmp_int_logs lg;
 
 
 
-SELECT	APPLICATION_NAME, 
-		ESPACE_NAME, 
-		ACTION, 
-		COUNT(*) AS EXECUTIONS, 
-		SUM(HAS_ERROR) AS ERRORS, 
-		(SUM(HAS_ERROR) * 100) / COUNT(*) AS PERC_ERRORS,
-		MAX(DURATION) AS MAX_DURATION_MS, 
-		AVG(duration) AS AVG_DURATION_MS
-FROM	#TMP_FINAL_LOGS
---WHERE	INSTDATE = '2021-04-05'
-GROUP BY APPLICATION_NAME, ESPACE_NAME, ACTION
-ORDER BY 8 desc
+select	application_name, 
+		espace_name, 
+		action, 
+		count(*) as executions, 
+		sum(has_error) as errors, 
+		(sum(has_error) * 100) / count(*) as perc_errors,
+		avg(duration) as avg_duration_ms,
+		max(duration) as max_duration_ms, 
+		avg(duration) * count(*) as row_weight
+from	#tmp_final_logs
+--where	instdate = '2021-04-05'
+group by application_name, espace_name, action
+order by 9 desc
 
 
 -----------------------------------------------------------------------------------------------------------------------------------------------------------
