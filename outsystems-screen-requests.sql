@@ -28,14 +28,14 @@ from	oslog_screen_previous;
 -----------------------------------------------------------------------------------------------------------------------------------------------------------
 
 -- top pages with more duration
-select	screen, application_name, espace_name, count(*) as qtd_requests, AVG(duration_ms) as average_duration_ms, max(duration_ms) max_duration_ms
+select	screen, application_name, espace_name, count(*) as qtd_requests, AVG(duration_ms) as average_duration_ms, max(duration_ms) max_duration_ms, AVG(duration_ms) * count(*) as row_weight
 from	#temp_screenlog
 group by screen, application_name, espace_name
-order by 5 desc
+order by 7 desc
 
 
 --top pages with more view state
-select	screen, application_name, espace_name, count(*) as qtd_requests, AVG(viewstate_kb) as average_viewstate_kb, max(viewstate_kb) max_viewstate_kb
+select	screen, application_name, espace_name, count(*) as qtd_requests, AVG(viewstate_kb) as average_viewstate_kb, max(viewstate_kb) max_viewstate_kb, AVG(viewstate_kb) * count(*) as row_weight
 from	#temp_screenlog
 group by screen, application_name, espace_name
-order by 5 desc
+order by 7 desc
