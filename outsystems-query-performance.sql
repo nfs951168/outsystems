@@ -46,7 +46,7 @@ WHERE (MIN_DURATION_RNK > 1 AND MAX_DURATION_RNK > 1)
 -----------------------------------------------------------------------------------------------------
  
 with performance as (
-select Application_Name, eSpace_Name, Query, count(*) as Executions, AVG(duration) as AverageDuration_ms, max(duration) as MaxDuration_ms
+select Application_Name, eSpace_Name, Query, count(*) as Executions, AVG(duration) as AverageDuration_ms, max(duration) as MaxDuration_ms, AVG(duration) * count(*) as row_weight
 from #TMP_PERFORMANCE_LOGS_FINAL
 where	1 = 1
 --where InsTime between '7:00:00' and '21:00:00'
@@ -57,8 +57,8 @@ group by application_Name, eSpace_name, Query
  
 select *
 from performance
-where AverageDuration_ms > 1000
-order by AverageDuration_ms desc
+--where AverageDuration_ms > 1000
+order by row_weight desc
  
 -----------------------------------------------------------------------------------------------------
 --4: Get most executed queries
