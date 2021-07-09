@@ -4,7 +4,7 @@
 --sys.tables: list each user table in current SQL Server Database
 --sys.indexes: Contains a row per index or heap of a tabular object, such as a table, view, or table-valued function
 --sys.partitions: has the partitions of all tables and the number of rows
---sys_allocation_units: Number of pages of each allocation unit
+--sys_allocation_units: Number of pages of each allocation unit (each allocation page is 8KB)
 --sys.schemas: identifies the schema of each table
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
