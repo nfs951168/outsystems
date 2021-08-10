@@ -105,3 +105,22 @@ where	er.[producer_name] = 'outsystemsui'
 and	er.[name] like 'deprecated%'
 and	e.is_active = 1
 group by er.[producer_name], er.[producer_kind], e.[name], a.NAME
+
+
+-------------------------------------------------------------------------------------------------------------------------------------------------
+--Gets all forge components and their info (version)
+-------------------------------------------------------------------------------------------------------------------------------------------------
+SELECT	Application.Name Name,  
+		ApplicationId,  
+		HasLocalChanges,  
+		(CAST(ROUND(ForgeBaseVersion, 0)/1000000 as int)) Major, 
+		(CAST(ROUND(ForgeBaseVersion, 0)%1000000 as int)/1000) Minor, 
+		(CAST(ROUND(ForgeBaseVersion, 0)%1000 as int)) Revision, 
+		ForgeBaseVersion, 
+		LastSync  
+FROM	OSSYS_APP_FORGE AppForge INNER JOIN OSSYS_APPLICATION Application ON (Application.ID = AppForge.ApplicationId AND Application.Is_Active=1)
+WHERE	AppForge.LastSync = (SELECT Max(OSSYS_APP_FORGE.LastSync) 
+							 FROM OSSYS_APP_FORGE INNER JOIN OSSYS_APPLICATION ON (OSSYS_APPLICATION.ID = OSSYS_APP_FORGE.ApplicationId AND OSSYS_APPLICATION.Is_Active=1)
+							 WHERE OSSYS_APP_FORGE.ApplicationId = AppForge.ApplicationId) 
+AND		Application.Name LIKE '%adoption%' 
+ORDER BY Application.Name ASC
