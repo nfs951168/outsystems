@@ -50,16 +50,18 @@ and     app.name = 'Delta Mobile Backoffice Core'
 
 
 -------------------------------------------------------------------------------------------------------------------------------------------------
---ROLES: Get users active with number of roles associated
-
+--ROLES: Get Roles for given user
 --ossys_user_effective_role: Read-only view containing user specific roles (either direct or via user groups).
 -------------------------------------------------------------------------------------------------------------------------------------------------
- SELECT usr.id, usr.USERNAME, usr.TENANT_ID, usr.LAST_LOGIN, count(usrl.role_id) as Roles
- FROM   OSSYS_USER usr left join ossys_User_Effective_Role usrl on (usr.id = usrl.USER_ID and usr.TENANT_ID = usrl.TENANT_ID)
- where  usr.IS_ACTIVE = 1
- and    usr.TENANT_ID = 12
- group by usr.id, usr.USERNAME, usr.TENANT_ID, usr.LAST_LOGIN
- order by usr.username asc
+ SELECT u.id, 
+	u.USERNAME, 
+	u.TENANT_ID, 
+	u.LAST_LOGIN,
+	ur.Role_Id,
+	r.name as RoleName
+ FROM   OSSYS_USER u left join ossys_User_Effective_Role ur on (u.id = ur.USER_ID and ur.TENANT_ID = u.TENANT_ID)
+		     inner join ossys_Role r on (r.id = ur.role_id)
+ where  u.ID = 3996;
 
 
 -------------------------------------------------------------------------------------------------------------------------------------------------
