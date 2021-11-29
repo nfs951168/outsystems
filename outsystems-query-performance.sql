@@ -21,7 +21,22 @@ into	#TMP_PERFORMANCE_LOGS
 from	oslog_General_previous lg
 where	lg.module_name = 'SLOWSQL';
  
- 
+
+insert into #TMP_PERFORMANCE_LOGS
+select	convert(date, lg.instant) InstDate,
+		convert(time, lg.instant) InsTime,
+		lg.Instant,
+		lg.Application_Name,
+		lg.Espace_Name,
+		lg.Message,
+		lg.Action_Name,
+		lg.Entrypoint_Name,
+		ltrim(replace(left(lg.message, patindex ('%[0-9]%', lg.message)-6), 'Query', '')) as Query,
+		cast(substring(lg.message, charindex(' took ', lg.message, 0) + 6, charindex(' ms', lg.Message, 0) - 6 - charindex(' took ', lg.message, 0)) as int) duration,
+		--cast(substring (replace(RIGHT(lg.message,15), 'ms', ''), patindex ('%[0-9]%', replace(RIGHT(lg.message,15), 'ms', '')), 10) as int) duration,
+		'LW' as PeriodType
+from	oslog_General lg
+where	lg.module_name = 'SLOWSQL';
 
 -----------------------------------------------------------------------------------------------------
 --2. Remove most expensive duration and less expensive duration from the analysis, by query and day
