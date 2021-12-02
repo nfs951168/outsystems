@@ -24,7 +24,7 @@ where	lg.module_name = 'SLOWSQL';
 
 insert into #TMP_PERFORMANCE_LOGS
 select	convert(date, lg.instant) InstDate,
-		convert(time, lg.instant) InsTime,
+		convert(time, lg.instant) InstTime,
 		lg.Instant,
 		lg.Application_Name,
 		lg.Espace_Name,
@@ -65,7 +65,7 @@ select Application_Name, eSpace_Name, Query, count(*) as Executions, AVG(duratio
 from #TMP_PERFORMANCE_LOGS_FINAL
 where	1 = 1
 --where InsTime between '7:00:00' and '21:00:00'
---and InstDate >= '2021-03-10'
+and InstDate >= '2021-12-01'
 --and		periodType = 'CW'
 group by application_Name, eSpace_name, Query
 )
@@ -84,10 +84,17 @@ where InstDate = '2020-05-18'
 group by query
 order by 2 desc
  
- 
+
+ -----------------------------------------------------------------------------------------------------
+--5: get raw data to analisys
+-----------------------------------------------------------------------------------------------------
+select instDate, datepart(hour, InsTime) Time_Hour, Espace_Name, Action_Name, Query, duration
+from	#TMP_PERFORMANCE_LOGS_FINAL
+where	1 = 1
+and InstDate >= '2021-12-01'
  
 -----------------------------------------------------------------------------------------------------
---5: specific queries
+--6: specific queries
 -----------------------------------------------------------------------------------------------------
 select min(instant), max(instant)
 from #TMP_PERFORMANCE_LOGS
