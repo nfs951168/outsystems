@@ -169,3 +169,13 @@ WHERE	AppForge.LastSync = (SELECT Max(OSSYS_APP_FORGE.LastSync)
 							 WHERE OSSYS_APP_FORGE.ApplicationId = AppForge.ApplicationId) 
 AND		Application.Name LIKE '%adoption%' 
 ORDER BY Application.Name ASC
+
+
+
+-------------------------------------------------------------------------------------------------------------------------------------------------
+--get espaces physical size
+-------------------------------------------------------------------------------------------------------------------------------------------------
+select	es.NAME, es.VERSION_ID, Datalength(esv.oml_file) / 1024 as MB
+from	ossys_Espace es inner join ossys_Espace_Version esv on (esv.id = es.version_id)
+where	es.IS_ACTIVE = 1
+order by 3 desc
