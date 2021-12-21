@@ -13,7 +13,8 @@ select	convert(date, lg.instant) InstDate,
 		lg.Message,
 		lg.Action_Name,
 		lg.Entrypoint_Name,
-		ltrim(replace(left(lg.message, patindex ('%[0-9]%', lg.message)-6), 'Query', '')) as Query,
+		--ltrim(replace(left(lg.message, patindex ('%[0-9]%', lg.message)-6), 'Query', '')) as Query,
+		substring(message, 0, charindex(' took ', message, 0)) as Query,
 		cast(substring(lg.message, charindex(' took ', lg.message, 0) + 6, charindex(' ms', lg.Message, 0) - 6 - charindex(' took ', lg.message, 0)) as int) duration,
 		--cast(substring (replace(RIGHT(lg.message,15), 'ms', ''), patindex ('%[0-9]%', replace(RIGHT(lg.message,15), 'ms', '')), 10) as int) duration,
 		'LW' as PeriodType
@@ -31,7 +32,8 @@ select	convert(date, lg.instant) InstDate,
 		lg.Message,
 		lg.Action_Name,
 		lg.Entrypoint_Name,
-		ltrim(replace(left(lg.message, patindex ('%[0-9]%', lg.message)-6), 'Query', '')) as Query,
+		--ltrim(replace(left(lg.message, patindex ('%[0-9]%', lg.message)-6), 'Query', '')) as Query,
+		substring(message, 0, charindex(' took ', message, 0)) as Query,
 		cast(substring(lg.message, charindex(' took ', lg.message, 0) + 6, charindex(' ms', lg.Message, 0) - 6 - charindex(' took ', lg.message, 0)) as int) duration,
 		--cast(substring (replace(RIGHT(lg.message,15), 'ms', ''), patindex ('%[0-9]%', replace(RIGHT(lg.message,15), 'ms', '')), 10) as int) duration,
 		'LW' as PeriodType
@@ -65,16 +67,18 @@ select Application_Name, eSpace_Name, Query, count(*) as Executions, AVG(duratio
 from #TMP_PERFORMANCE_LOGS_FINAL
 where	1 = 1
 --where InsTime between '7:00:00' and '21:00:00'
-and InstDate >= '2021-12-01'
+--and InstDate >= '2021-12-01'
 --and		periodType = 'CW'
 group by application_Name, eSpace_name, Query
 )
  
-select *
-from performance
---where AverageDuration_ms > 1000
+select application_name, espace_name, query, executions, averageduration_ms, maxduration_ms, row_weight
+from	performance
 order by row_weight desc
- 
+
+
+
+
 -----------------------------------------------------------------------------------------------------
 --4: Get most executed queries
 -----------------------------------------------------------------------------------------------------
