@@ -25,6 +25,19 @@ INTO	#TMP_INT_LOGS
 FROM	oslog_Integration_Previous;
 
 
+Insert into #TMP_INT_LOGS
+SELECT	Application_Name, 
+		Espace_Name, 
+		Instant, 
+		Duration, 
+		Type, 
+		Endpoint, 
+		Action, 
+		Error_Id, 
+		Executed_by, 
+		Is_Expose, 
+		Request_Key
+FROM	oslog_Integration;
 
 -----------------------------------------------------------------------------------------------------------------------------------------------------------
 --CALUCLATE METRICS
@@ -64,4 +77,3 @@ HAVING COUNT(*) > 1
 select	*
 from	#TMP_INT_LOGS
 WHERE	request_key = '6c4f0db2-10f0-44f6-b356-e52c63bbc41e'
-
