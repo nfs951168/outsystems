@@ -8,7 +8,10 @@
 --osusr_mrn_moduledef1: store info about an OutSystems module and its violations
 -------------------------------------------------------------------------------------------------------------------------------------------------
 
-select	md.name as [module-name],
+select	md.Id,
+		md.name as [module-name],
+		md.ESPACEID as [espace-id],
+		md.ISDELETED [module-isdeleted],
 		ad.domainid as [domain-id], 
         d.label as [domain],
 		ad.name as [application-name], 
@@ -21,4 +24,8 @@ select	md.name as [module-name],
 from	osusr_mrn_moduledef1 md inner join osusr_mrn_applicationdef1 ad	on (md.applicationdefid = ad.id)
 								left join  osusr_mrn_domain d on (ad.domainid = d.id)
 								left join  osusr_mrn_modulelayer1 ml on  (ad.layer =  ml.id)
-where	d.label = ''
+where	1 = 1
+and		md.ISDELETED = 0
+and		ml.IS_ACTIVE = 1
+and		d.label = ''
+order by md.NAME asc
