@@ -7,8 +7,9 @@ DROP TABLE #temp_screenlog;
 
 
 -----------------------------------------------------------------------------------------------------------------------------------------------------------
---CREATE TEMPTABLE WITH SCREEN DATA
+--create temp table with traditional web screen requests
 -----------------------------------------------------------------------------------------------------------------------------------------------------------
+--previous week
 select	instant, 
 		screen, 
 		application_name, 
@@ -18,9 +19,21 @@ select	instant,
 		duration [duration_ms], 
 		viewstate_bytes/1024 [viewstate_kb], 
 		session_bytes/1024 [session_kb]
-INTO	#temp_screenlog
-from	oslog_screen_previous;
+INTO	#temp_screenlog 
+from	oslog_screen_previous with (nolock);
 
+--current week
+insert into #temp_screenlog
+select	instant, 
+		screen, 
+		application_name, 
+		espace_name, 
+		action_name, 
+		access_mode, 
+		duration [duration_ms], 
+		viewstate_bytes/1024 [viewstate_kb], 
+		session_bytes/1024 [session_kb]
+from	oslog_screen with (nolock);
 
 
 -----------------------------------------------------------------------------------------------------------------------------------------------------------
