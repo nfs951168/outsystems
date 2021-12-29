@@ -46,7 +46,7 @@ from    ossys_site_property_definition spd  inner join ossys_espace es on (es.id
                                             left join ossys_site_property sp on (sp.site_property_definition_id = sp.id)
 where   spd.is_active = 1 --only active site properties
 and     es.is_active = 1 --only active espaces
-and     app.name = 'Delta Mobile Backoffice Core'
+and     app.name = 'xxxxxxx'
 
 
 -------------------------------------------------------------------------------------------------------------------------------------------------
