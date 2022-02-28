@@ -1,10 +1,4 @@
 -----------------------------------------------------------------------------------------------------------------------------------------------------------
---SCRIPT TO DROP TEMP TABLES
------------------------------------------------------------------------------------------------------------------------------------------------------------
-DROP TABLE #TMP_INT_LOGS;
-DROP TABLE #TMP_FINAL_LOGS;
-
------------------------------------------------------------------------------------------------------------------------------------------------------------
 --COLLECT LOGS FROM LOG TABLES
 
 --OSLOG_INTEGRATION_X: ONE LOG TABLE BY WEEK
@@ -22,7 +16,7 @@ SELECT	Application_Name,
 		Is_Expose, 
 		Request_Key
 INTO	#TMP_INT_LOGS
-FROM	oslog_Integration_Previous;
+FROM	oslog_Integration_0 with (nolock);
 
 
 Insert into #TMP_INT_LOGS
@@ -37,7 +31,119 @@ SELECT	Application_Name,
 		Executed_by, 
 		Is_Expose, 
 		Request_Key
-FROM	oslog_Integration;
+FROM	oslog_Integration_1 with (nolock);
+
+Insert into #TMP_INT_LOGS
+SELECT	Application_Name, 
+		Espace_Name, 
+		Instant, 
+		Duration, 
+		Type, 
+		Endpoint, 
+		Action, 
+		Error_Id, 
+		Executed_by, 
+		Is_Expose, 
+		Request_Key
+FROM	oslog_Integration_2 with (nolock);
+
+Insert into #TMP_INT_LOGS
+SELECT	Application_Name, 
+		Espace_Name, 
+		Instant, 
+		Duration, 
+		Type, 
+		Endpoint, 
+		Action, 
+		Error_Id, 
+		Executed_by, 
+		Is_Expose, 
+		Request_Key
+FROM	oslog_Integration_3 with (nolock);
+
+Insert into #TMP_INT_LOGS
+SELECT	Application_Name, 
+		Espace_Name, 
+		Instant, 
+		Duration, 
+		Type, 
+		Endpoint, 
+		Action, 
+		Error_Id, 
+		Executed_by, 
+		Is_Expose, 
+		Request_Key
+FROM	oslog_Integration_4 with (nolock);
+
+Insert into #TMP_INT_LOGS
+SELECT	Application_Name, 
+		Espace_Name, 
+		Instant, 
+		Duration, 
+		Type, 
+		Endpoint, 
+		Action, 
+		Error_Id, 
+		Executed_by, 
+		Is_Expose, 
+		Request_Key
+FROM	oslog_Integration_5 with (nolock);
+
+Insert into #TMP_INT_LOGS
+SELECT	Application_Name, 
+		Espace_Name, 
+		Instant, 
+		Duration, 
+		Type, 
+		Endpoint, 
+		Action, 
+		Error_Id, 
+		Executed_by, 
+		Is_Expose, 
+		Request_Key
+FROM	oslog_Integration_6 with (nolock);
+
+Insert into #TMP_INT_LOGS
+SELECT	Application_Name, 
+		Espace_Name, 
+		Instant, 
+		Duration, 
+		Type, 
+		Endpoint, 
+		Action, 
+		Error_Id, 
+		Executed_by, 
+		Is_Expose, 
+		Request_Key
+FROM	oslog_Integration_7 with (nolock);
+
+Insert into #TMP_INT_LOGS
+SELECT	Application_Name, 
+		Espace_Name, 
+		Instant, 
+		Duration, 
+		Type, 
+		Endpoint, 
+		Action, 
+		Error_Id, 
+		Executed_by, 
+		Is_Expose, 
+		Request_Key
+FROM	oslog_Integration_8 with (nolock);
+
+Insert into #TMP_INT_LOGS
+SELECT	Application_Name, 
+		Espace_Name, 
+		Instant, 
+		Duration, 
+		Type, 
+		Endpoint, 
+		Action, 
+		Error_Id, 
+		Executed_by, 
+		Is_Expose, 
+		Request_Key
+FROM	oslog_Integration_9 with (nolock);
 
 -----------------------------------------------------------------------------------------------------------------------------------------------------------
 --CALUCLATE METRICS
