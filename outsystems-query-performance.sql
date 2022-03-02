@@ -15,11 +15,9 @@ select	convert(date, lg.instant) InstDate,
 		lg.Entrypoint_Name,
 		--ltrim(replace(left(lg.message, patindex ('%[0-9]%', lg.message)-6), 'Query', '')) as Query,
 		substring(message, 0, charindex(' took ', message, 0)) as Query,
-		cast(substring(lg.message, charindex(' took ', lg.message, 0) + 6, charindex(' ms', lg.Message, 0) - 6 - charindex(' took ', lg.message, 0)) as int) duration,
-		--cast(substring (replace(RIGHT(lg.message,15), 'ms', ''), patindex ('%[0-9]%', replace(RIGHT(lg.message,15), 'ms', '')), 10) as int) duration,
-		'LW' as PeriodType
+		cast(substring(lg.message, charindex(' took ', lg.message, 0) + 6, charindex(' ms', lg.Message, 0) - 6 - charindex(' took ', lg.message, 0)) as int) duration
 into	#TMP_PERFORMANCE_LOGS
-from	oslog_General_previous lg
+from	oslog_General_0 lg with (nolock)
 where	lg.module_name = 'SLOWSQL';
  
 
@@ -32,12 +30,121 @@ select	convert(date, lg.instant) InstDate,
 		lg.Message,
 		lg.Action_Name,
 		lg.Entrypoint_Name,
-		--ltrim(replace(left(lg.message, patindex ('%[0-9]%', lg.message)-6), 'Query', '')) as Query,
 		substring(message, 0, charindex(' took ', message, 0)) as Query,
-		cast(substring(lg.message, charindex(' took ', lg.message, 0) + 6, charindex(' ms', lg.Message, 0) - 6 - charindex(' took ', lg.message, 0)) as int) duration,
-		--cast(substring (replace(RIGHT(lg.message,15), 'ms', ''), patindex ('%[0-9]%', replace(RIGHT(lg.message,15), 'ms', '')), 10) as int) duration,
-		'LW' as PeriodType
-from	oslog_General lg
+		cast(substring(lg.message, charindex(' took ', lg.message, 0) + 6, charindex(' ms', lg.Message, 0) - 6 - charindex(' took ', lg.message, 0)) as int) duration
+from	oslog_General_1 lg with (nolock)
+where	lg.module_name = 'SLOWSQL';
+
+insert into #TMP_PERFORMANCE_LOGS
+select	convert(date, lg.instant) InstDate,
+		convert(time, lg.instant) InstTime,
+		lg.Instant,
+		lg.Application_Name,
+		lg.Espace_Name,
+		lg.Message,
+		lg.Action_Name,
+		lg.Entrypoint_Name,
+		substring(message, 0, charindex(' took ', message, 0)) as Query,
+		cast(substring(lg.message, charindex(' took ', lg.message, 0) + 6, charindex(' ms', lg.Message, 0) - 6 - charindex(' took ', lg.message, 0)) as int) duration
+from	oslog_General_2 lg with (nolock)
+where	lg.module_name = 'SLOWSQL';
+
+insert into #TMP_PERFORMANCE_LOGS
+select	convert(date, lg.instant) InstDate,
+		convert(time, lg.instant) InstTime,
+		lg.Instant,
+		lg.Application_Name,
+		lg.Espace_Name,
+		lg.Message,
+		lg.Action_Name,
+		lg.Entrypoint_Name,
+		substring(message, 0, charindex(' took ', message, 0)) as Query,
+		cast(substring(lg.message, charindex(' took ', lg.message, 0) + 6, charindex(' ms', lg.Message, 0) - 6 - charindex(' took ', lg.message, 0)) as int) duration
+from	oslog_General_3 lg with (nolock)
+where	lg.module_name = 'SLOWSQL';
+
+insert into #TMP_PERFORMANCE_LOGS
+select	convert(date, lg.instant) InstDate,
+		convert(time, lg.instant) InstTime,
+		lg.Instant,
+		lg.Application_Name,
+		lg.Espace_Name,
+		lg.Message,
+		lg.Action_Name,
+		lg.Entrypoint_Name,
+		substring(message, 0, charindex(' took ', message, 0)) as Query,
+		cast(substring(lg.message, charindex(' took ', lg.message, 0) + 6, charindex(' ms', lg.Message, 0) - 6 - charindex(' took ', lg.message, 0)) as int) duration
+from	oslog_General_4 lg with (nolock)
+where	lg.module_name = 'SLOWSQL';
+
+insert into #TMP_PERFORMANCE_LOGS
+select	convert(date, lg.instant) InstDate,
+		convert(time, lg.instant) InstTime,
+		lg.Instant,
+		lg.Application_Name,
+		lg.Espace_Name,
+		lg.Message,
+		lg.Action_Name,
+		lg.Entrypoint_Name,
+		substring(message, 0, charindex(' took ', message, 0)) as Query,
+		cast(substring(lg.message, charindex(' took ', lg.message, 0) + 6, charindex(' ms', lg.Message, 0) - 6 - charindex(' took ', lg.message, 0)) as int) duration
+from	oslog_General_5 lg with (nolock)
+where	lg.module_name = 'SLOWSQL';
+
+insert into #TMP_PERFORMANCE_LOGS
+select	convert(date, lg.instant) InstDate,
+		convert(time, lg.instant) InstTime,
+		lg.Instant,
+		lg.Application_Name,
+		lg.Espace_Name,
+		lg.Message,
+		lg.Action_Name,
+		lg.Entrypoint_Name,
+		substring(message, 0, charindex(' took ', message, 0)) as Query,
+		cast(substring(lg.message, charindex(' took ', lg.message, 0) + 6, charindex(' ms', lg.Message, 0) - 6 - charindex(' took ', lg.message, 0)) as int) duration
+from	oslog_General_6 lg with (nolock)
+where	lg.module_name = 'SLOWSQL';
+
+insert into #TMP_PERFORMANCE_LOGS
+select	convert(date, lg.instant) InstDate,
+		convert(time, lg.instant) InstTime,
+		lg.Instant,
+		lg.Application_Name,
+		lg.Espace_Name,
+		lg.Message,
+		lg.Action_Name,
+		lg.Entrypoint_Name,
+		substring(message, 0, charindex(' took ', message, 0)) as Query,
+		cast(substring(lg.message, charindex(' took ', lg.message, 0) + 6, charindex(' ms', lg.Message, 0) - 6 - charindex(' took ', lg.message, 0)) as int) duration
+from	oslog_General_7 lg with (nolock)
+where	lg.module_name = 'SLOWSQL';
+
+insert into #TMP_PERFORMANCE_LOGS
+select	convert(date, lg.instant) InstDate,
+		convert(time, lg.instant) InstTime,
+		lg.Instant,
+		lg.Application_Name,
+		lg.Espace_Name,
+		lg.Message,
+		lg.Action_Name,
+		lg.Entrypoint_Name,
+		substring(message, 0, charindex(' took ', message, 0)) as Query,
+		cast(substring(lg.message, charindex(' took ', lg.message, 0) + 6, charindex(' ms', lg.Message, 0) - 6 - charindex(' took ', lg.message, 0)) as int) duration
+from	oslog_General_8 lg with (nolock)
+where	lg.module_name = 'SLOWSQL';
+
+insert into #TMP_PERFORMANCE_LOGS
+select	convert(date, lg.instant) InstDate,
+		convert(time, lg.instant) InstTime,
+		lg.Instant,
+		lg.Application_Name,
+		lg.Espace_Name,
+		lg.Message,
+		lg.Action_Name,
+		lg.Entrypoint_Name,
+		substring(message, 0, charindex(' took ', message, 0)) as Query,
+		cast(substring(lg.message, charindex(' took ', lg.message, 0) + 6, charindex(' ms', lg.Message, 0) - 6 - charindex(' took ', lg.message, 0)) as int) duration
+from	oslog_General_9 lg with (nolock)
 where	lg.module_name = 'SLOWSQL';
 
 -----------------------------------------------------------------------------------------------------
@@ -68,7 +175,6 @@ from #TMP_PERFORMANCE_LOGS_FINAL
 where	1 = 1
 --where InsTime between '7:00:00' and '21:00:00'
 --and InstDate >= '2021-12-01'
---and		periodType = 'CW'
 group by application_Name, eSpace_name, Query
 )
  
