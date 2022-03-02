@@ -170,7 +170,7 @@ WHERE (MIN_DURATION_RNK > 1 AND MAX_DURATION_RNK > 1)
 -----------------------------------------------------------------------------------------------------
  
 with performance as (
-select Application_Name, eSpace_Name, Query, count(*) as Executions, AVG(duration) as AverageDuration_ms, max(duration) as MaxDuration_ms, AVG(duration) * count(*) as row_weight
+select Application_Name, eSpace_Name, Query, count(1) as Executions, AVG(duration) as AverageDuration_ms, max(duration) as MaxDuration_ms, AVG(duration) * count(*) as row_weight
 from #TMP_PERFORMANCE_LOGS_FINAL
 where	1 = 1
 --where InsTime between '7:00:00' and '21:00:00'
@@ -183,6 +183,11 @@ from	performance
 order by row_weight desc
 
 
+--Extraction by day and hour
+select	Query, Application_Name, Espace_Name, InstDate as 'Day', datepart(hour, instant) as 'Hour', count(1) Executions, avg(duration) AverageDuration_ms
+from	#TMP_PERFORMANCE_LOGS_FINAL
+group by Query, Application_Name, Espace_Name, InstDate, datepart(hour, instant)
+order by 1, 4, 5
 
 
 -----------------------------------------------------------------------------------------------------
@@ -213,3 +218,8 @@ and		periodType = 'CW'
 and		query = 'GetDataToSync.GetVendas_Objectivos_Categorias.GetVendasPontoVenda.List '
 --and InstDate = '2020-05-18'
 order by duration desc
+
+
+
+--date in analysis
+select min(instDate), max(instDate) from #TMP_PERFORMANCE_LOGS_FINAL
