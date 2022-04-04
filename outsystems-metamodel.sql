@@ -112,25 +112,36 @@ AND		U.IS_ACTIVE = 1
 --Integrations: Get consumed web services information
 -------------------------------------------------------------------------------------------------------------------------------------------------
  
---SOAP Integrations
-select  app.name as ApplicationName, es.name as ModuleName, wr.Is_Active, wr.name as IntegrationName, wr.url as DefaultURL, wr.Effective_URL as Effective_URL
-from    ossys_web_reference wr  inner join ossys_espace es on (es.Id = wr.espace_id)
-                                inner join ossys_module mo on (mo.espace_id = es.id)
-                                inner join ossys_app_definition_module adm on (adm.module_id = mo.id)
-                                inner join ossys_application app on (app.id = adm.application_id)
-where   wr.is_active = 1
-and     es.Is_Active = 1
---and     (wr.effective_url like '%dev%' or (wr.url like '%dev%' and wr.effective_url is null))
-union all
---REST Integrations
-select  app.name as ApplicationName, es.name as ModuleName, wr.Is_Active, wr.name as IntegrationName, wr.url as DefaultURL, wr.Effective_URL as Effective_URL
-from    ossys_rest_web_reference wr inner join ossys_espace es on (es.Id = wr.espace_id)
-                                    inner join ossys_module mo on (mo.espace_id = es.id)
-                                    inner join ossys_app_definition_module adm on (adm.module_id = mo.id)
-                                    inner join ossys_application app on (app.id = adm.application_id)
-where   wr.is_active = 1
-and     es.Is_Active = 1
---and     (wr.effective_url like '%dev%' or (wr.url like '%dev%' and wr.effective_url is null))
+DECLARE @webServiceName AS VARCHAR(100);
+
+SET @webServiceName = 'Client_API';
+
+WITH cte_integrations AS (
+	SELECT	'REST' AS IntegrationType, name as IntegrationName, ESPACE_ID, [URL], EFFECTIVE_URL, IS_ACTIVE, SS_KEY
+	FROM	OSSYS_REST_WEB_REFERENCE
+	WHERE	URL LIKE '%' + @webServiceName + '%' OR	(ISNULL(effective_url, '') = '' AND EFFECTIVE_URL LIKE '%' + @webServiceName + '%')
+	UNION ALL
+	SELECT	'SOAP' AS IntegrationType, name as IntegrationName, ESPACE_ID, [URL], EFFECTIVE_URL, IS_ACTIVE, SS_KEY
+	FROM	ossys_web_reference
+	WHERE	URL LIKE '%' + @webServiceName + '%' OR	(ISNULL(effective_url, '') = '' AND EFFECTIVE_URL LIKE '%' + @webServiceName + '%')
+)
+
+
+SELECT	wr.IntegrationType,
+		wr.IntegrationName,
+		app.name as ConsumerApplication,
+		es.NAME as ConsumerModule,
+		wr.URL, 
+		wr.EFFECTIVE_URL,
+		wr.IS_ACTIVE IntegrationStatus
+FROM	cte_integrations wr inner join ossys_espace es on (es.Id = wr.espace_id)
+                            inner join ossys_module mo on (mo.espace_id = es.id)
+                            inner join ossys_app_definition_module adm on (adm.module_id = mo.id)
+                            inner join ossys_application app on (app.id = adm.application_id)
+
+WHERE	1 = 1
+--active webreferences
+and		wr.IS_ACTIVE = 1;
 
 
  ------------------------------------------------------------------------------------------------------------------------------------------------
