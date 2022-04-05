@@ -8,13 +8,15 @@ select	en.Id, en.name,
 	app.NAME as ApplicationName, 
 	d.name as DatabaseCatalog, 
 	d.DataTablespace, 
-	d.IndexTablespace, d.name + '.dbo.' + en.PHYSICAL_TABLE_NAME as physical_full_name
+	d.IndexTablespace, 
+	replace(d.name, '(Main)', 'outsystems') + '.dbo.' + en.PHYSICAL_TABLE_NAME as physical_full_name
 from	ossys_Entity en inner join ossys_espace es on (es.id = en.ESPACE_ID)
 			inner join ossys_module mo on (mo.espace_id = es.id)
 			inner join ossys_app_definition_module adm on (adm.module_id = mo.id)
                         inner join ossys_application app on (app.id = adm.application_id)
 			left join ossys_dbcatalog d on (d.id = es.DBCatalog_Id)
-where	es.name like '%billing_cs%'
+where	1 = 1
+--and		es.name like '%billing_cs%'
 and		en.IS_ACTIVE = 1;
 
 
