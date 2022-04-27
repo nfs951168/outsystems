@@ -192,3 +192,35 @@ select	es.NAME, es.VERSION_ID, Datalength(esv.oml_file) / 1024 as MB
 from	ossys_Espace es inner join ossys_Espace_Version esv on (esv.id = es.version_id)
 where	es.IS_ACTIVE = 1
 order by 3 desc
+
+
+-------------------------------------------------------------------------------------------------------------------------------------------------
+--Get timers (cyclic jobs) metadata info
+
+--ossys_meta_cyclic_job: timers metadata informatios
+--Site_Property_Shared: Single tenant site property effective values.
+--Espace: Espaces defined in Service Studio. Older and deleted eSpaces are kept as inactive.
+--Module: An eSpace or an Extension. Used to aggregate espaces into an application
+--App_Definition_Module: Modules for a specific application definition.
+--Application: Applications in this environment. Old applications are kept as inactive
+-------------------------------------------------------------------------------------------------------------------------------------------------
+select	a.NAME as application_name,
+		e.name as module_name, 
+		mcj.name as timer_name, 
+		mcj.timeout, 
+		mcj.default_schedule, 
+		mcj.is_active as timer_active,
+		cjs.schedule,
+		cjs.is_running_by,
+		cjs.is_running_since,
+		cjs.last_duration,
+		cjs.last_run,
+		cjs.next_run
+from	ossys_meta_cyclic_job mcj with (nolock) inner join ossys_espace e with (nolock) on (e.id = mcj.espace_id)
+												inner join ossys_module m with (nolock) on (m.espace_id = e.id)
+												inner join ossys_app_definition_module adm with (nolock) on (adm.module_id = m.id)
+												inner join ossys_application a with (nolock) on (a.id = adm.application_id)
+												left join ossys_cyclic_job_shared cjs with (nolock) on (cjs.meta_cyclic_job_id = mcj.id)
+where	1 = 1
+and		e.is_active = 1
+and		mcj.is_active = 1
