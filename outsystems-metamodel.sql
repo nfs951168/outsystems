@@ -9,7 +9,7 @@ select	en.Id, en.name,
 	d.name as DatabaseCatalog, 
 	d.DataTablespace, 
 	d.IndexTablespace, 
-	replace(d.name, '(Main)', 'outsystems') + '.dbo.' + en.PHYSICAL_TABLE_NAME as physical_full_name
+	replace(d.name, '(Main)', 'outsystems') + '.dbo.' + en.PHYSICAL_TABLE_NAME + ' with (nolock) ' as physical_full_name
 from	ossys_Entity en inner join ossys_espace es on (es.id = en.ESPACE_ID)
 			inner join ossys_module mo on (mo.espace_id = es.id)
 			inner join ossys_app_definition_module adm on (adm.module_id = mo.id)
