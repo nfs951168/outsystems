@@ -171,15 +171,15 @@ order by 9 desc
 
 
 -----------------------------------------------------------------------------------------------------------------------------------------------------------
---Other scripts
+--Global statistics
 -----------------------------------------------------------------------------------------------------------------------------------------------------------
 
+declare @startDate datetime = '2022-05-22 00:00:00'
+declare @endDate datetime = '2022-05-28 23:59:29'
+declare @threshold int = 3000
 
-select	Request_Key, COUNT(*)
-FROM	#TMP_INT_LOGS
-GROUP BY REQUEST_KEY 
-HAVING COUNT(*) > 1
 
-select	*
+select	'Integrations requests' RequestType, Application_Name, count(*) as qtd_requests, SUM(case when Duration > @WR_Treshhold then 1 else 0 END) as SlowRequests
 from	#TMP_INT_LOGS
-WHERE	request_key = '6c4f0db2-10f0-44f6-b356-e52c63bbc41e'
+where	instant between @startDate and @endDate
+group by application_name
