@@ -315,3 +315,25 @@ select	screen, application_name, espace_name, count(*) as qtd_requests, AVG(view
 from	#temp_screenlog
 group by screen, application_name, espace_name
 order by 7 desc
+
+
+--global statistics
+
+declare @startDate datetime = '2022-05-22 00:00:00'
+declare @endDate datetime = '2022-05-28 23:59:29'
+declare @WR_Treshhold int = 3000
+declare @Re_Treshhold int = 800
+
+
+select	'Request Web traditional' RequestType, Application_Name, count(*) as qtd_requests, SUM(case when duration_ms > @WR_Treshhold then 1 else 0 END) as SlowRequests
+from	#temp_screenlog
+where	request_type = 'WT'
+and		instant between @startDate and @endDate
+group by application_name
+union all
+select	'Mobile' RequestType, Application_Name, count(*) as qtd_requests, SUM(case when duration_ms > @Re_Treshhold then 1 else 0 END) as SlowRequests
+from	#temp_screenlog
+where	request_type = 'RE'
+and		instant between @startDate and @endDate
+group by application_name
+
