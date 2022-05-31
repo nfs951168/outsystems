@@ -176,10 +176,13 @@ order by 9 desc
 
 declare @startDate datetime = '2022-05-22 00:00:00'
 declare @endDate datetime = '2022-05-28 23:59:29'
+declare @factoryName varchar(100) = ''
 declare @threshold int = 3000
 
 
-select	'Integrations requests' RequestType, Application_Name, count(*) as qtd_requests, SUM(case when Duration > @WR_Treshhold then 1 else 0 END) as SlowRequests
+select	@factoryName as FactoryName, 
+		convert(varchar, @startdate, 105) + ' to ' + convert(varchar, @endDate, 105) as Dates, 
+		'Integrations requests' RequestType, Application_Name, count(*) as qtd_requests, SUM(case when Duration > @threshold then 1 else 0 END) as SlowRequests
 from	#TMP_INT_LOGS
 where	instant between @startDate and @endDate
 group by application_name
