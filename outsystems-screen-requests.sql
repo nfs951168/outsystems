@@ -1,4 +1,4 @@
-use outsystems;
+use outsystems_;
 
 -----------------------------------------------------------------------------------------------------------------------------------------------------------
 --create temp table with traditional web screen requests
@@ -321,19 +321,27 @@ order by 7 desc
 
 declare @startDate datetime = '2022-05-22 00:00:00'
 declare @endDate datetime = '2022-05-28 23:59:29'
-declare @WR_Treshhold int = 3000
-declare @Re_Treshhold int = 800
+declare @WR_threshold int = 3000
+declare @Re_threshold int = 800
+declare @factoryName varchar(100) = ''
 
 
-select	'Request Web traditional' RequestType, Application_Name, count(*) as qtd_requests, SUM(case when duration_ms > @WR_Treshhold then 1 else 0 END) as SlowRequests
+select	@factoryName as FactoryName, 
+		convert(varchar, @startdate, 105) + ' to ' + convert(varchar, @endDate, 105) as Dates, 
+		'Request Web traditional' as RequestType, 
+		Application_Name, count(*) as qtd_requests, 
+		SUM(case when duration_ms > @WR_threshold then 1 else 0 END) as SlowRequests
 from	#temp_screenlog
 where	request_type = 'WT'
 and		instant between @startDate and @endDate
 group by application_name
 union all
-select	'Mobile' RequestType, Application_Name, count(*) as qtd_requests, SUM(case when duration_ms > @Re_Treshhold then 1 else 0 END) as SlowRequests
+select	@factoryName as FactoryName, 
+		convert(varchar, @startdate, 105) + ' to ' + convert(varchar, @endDate, 105) as Dates,
+		'Mobile' RequestType, 
+		Application_Name, count(*) as qtd_requests, 
+		SUM(case when duration_ms > @Re_threshold then 1 else 0 END) as SlowRequests
 from	#temp_screenlog
 where	request_type = 'RE'
 and		instant between @startDate and @endDate
 group by application_name
-
