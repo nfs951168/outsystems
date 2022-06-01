@@ -182,7 +182,12 @@ declare @threshold int = 3000
 
 select	@factoryName as FactoryName, 
 		convert(varchar, @startdate, 105) + ' to ' + convert(varchar, @endDate, 105) as Dates, 
-		'Integrations requests' RequestType, Application_Name, count(*) as qtd_requests, SUM(case when Duration > @threshold then 1 else 0 END) as SlowRequests
+		'Integrations requests' RequestType, Application_Name, count(*) as qtd_requests, 
+		SUM(case when Duration > @threshold then 1 else 0 END) as SlowRequests,
+		SUM(case when error_id <> '' then 1 else 0 end) as ErrorRequests
 from	#TMP_INT_LOGS
 where	instant between @startDate and @endDate
 group by application_name
+
+
+
