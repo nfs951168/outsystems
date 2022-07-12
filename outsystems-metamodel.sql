@@ -224,3 +224,34 @@ from	ossys_meta_cyclic_job mcj with (nolock) inner join ossys_espace e with (nol
 where	1 = 1
 and		e.is_active = 1
 and		mcj.is_active = 1
+
+
+
+-------------------------------------------------------------------------------------------------------------------------------------------------
+--Entity Attributes: get entity columns (foreign keys) with delete rule = ignore
+-------------------------------------------------------------------------------------------------------------------------------------------------
+
+SELECT  es.name as ModuleName,
+		en.Name as Entity,	
+		ea.name as AttributeName, 
+		ea.delete_rule, 
+		ea.type,
+		ea.ss_key,
+		en_f.name as foreign_key_entity,
+		en_f.Data_Kind
+FROM	ossys_Entity_Attr ea	inner join ossys_entity en on (en.id = ea.entity_id)
+								inner join ossys_espace es on (es.id = en.espace_id)
+								inner join ossys_entity en_f on (right(ea.type, 36) = en_f.SS_KEY)
+WHERE	1 = 1
+AND		ea.delete_rule = 'Ignore'
+AND		ea.is_active = 1
+AND		es.is_active = 1
+AND		en.Data_Kind <> 'staticEntity'
+AND		es.IS_SYSTEM = 0
+--exclude Service center and created fields
+AND		ea.name not IN ('created_By', 'updatedby', 'Last_Modified_By','CreatedBy', 'Id', 'UpdateBy')
+and		es.name not in ('servicecenter', 'ECT_Provider')
+and		en.name not in ('MenuItem', 'MenuSubItem')
+-- select only forign keys
+and		len(ea.type) = 75
+order by 1 asc, 2 asc
