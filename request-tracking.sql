@@ -1,5 +1,7 @@
+--------------------------------------------------------------------------------------------------------------------------
+--Allows to track a request that starts on mobile screen (service action, extension, slow sql, extension calls)
+--------------------------------------------------------------------------------------------------------------------------
 
---specific request analysis
 declare @request as varchar(50);
 
 set	@request = 'd2bc05ab-e2ea-4b50-8f1a-baeccf90d266';
@@ -47,7 +49,7 @@ with req as (
 	and		Module_Name = 'SLOWSQL'
 	and		request_key = @request
 	union all
-	select	'integration calls' + type as action,
+	select	'integration calls ' + type as action,
 			Request_Key,
 			instant,
 			Espace_Name,
@@ -77,6 +79,6 @@ with req as (
 	and		request_key = @request
 )
 
-select	*
+select	dateadd(ms, duration*-1, instant) request_start, *
 from	req
-order by instant desc
+order by 1 asc
