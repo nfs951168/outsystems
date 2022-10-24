@@ -1,7 +1,5 @@
-use outsystems_;
-
 -----------------------------------------------------------------------------------------------------------------------------------------------------------
---create temp table with traditional web screen requests
+--script 1 | performance statistics with priority field for all log data (mobile and traditional)
 -----------------------------------------------------------------------------------------------------------------------------------------------------------
 select	'WT' as request_type,
 		instant, 
@@ -140,9 +138,8 @@ select	'WT' as request_type,
 from	oslog_screen_9 with (nolock);
 
 
------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 --add mobile requests
------------------------------------------------------------------------------------------------------------------------------------------------------------
 insert into #temp_screenlog
 select	'RE' as request_type,
 		instant, 
@@ -274,10 +271,7 @@ select	'RE' as request_type,
 from	oslog_mobile_request_9 with (nolock);
 
 
------------------------------------------------------------------------------------------------------------------------------------------------------------
---RETURN STATISTICS
------------------------------------------------------------------------------------------------------------------------------------------------------------
-
+--return statistics
 -- web traditional top 20 pages with more avg duration
 with req_data as (
 	select	application_name, screen,  count(*) as qtd_requests, AVG(convert(bigint, duration_ms)) as average_duration_ms, max(convert(bigint, duration_ms)) max_duration_ms,
@@ -309,15 +303,9 @@ order by 5 desc
 
 
 
-
---top pages with more view state
-select	screen, application_name, espace_name, count(*) as qtd_requests, AVG(viewstate_kb) as average_viewstate_kb, max(viewstate_kb) max_viewstate_kb, AVG(viewstate_kb) * count(*) as row_weight
-from	#temp_screenlog
-group by screen, application_name, espace_name
-order by 7 desc
-
-
---global statistics
+-----------------------------------------------------------------------------------------------------------------------------------------------------------
+--script 2 | report indicator
+-----------------------------------------------------------------------------------------------------------------------------------------------------------
 
 declare @startDate datetime = '2022-05-22 00:00:00'
 declare @endDate datetime = '2022-05-28 23:59:29'
@@ -345,3 +333,41 @@ from	#temp_screenlog
 where	request_type = 'RE'
 and		instant between @startDate and @endDate
 group by application_name
+
+
+
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------
+--script 3 | performance statistics with priority field for last week
+-----------------------------------------------------------------------------------------------------------------------------------------------------------
+
+-- web traditional top 20 pages with more avg duration
+with req_data as (
+	select	application_name, screen,  count(*) as qtd_requests, AVG(convert(bigint, duration)) as average_duration_ms, max(convert(bigint, duration)) max_duration_ms,
+	case when AVG(convert(bigint, duration)) < 500 then 0 
+		     when AVG(convert(bigint, duration)) between 500 and 800 then 2 
+			 when AVG(convert(bigint, duration)) between 801 and 1000 then 3
+			 when AVG(convert(bigint, duration)) between 1001 and 2000 then 5
+			 when AVG(convert(bigint, duration)) between 2001 and 3000 then 8
+			 when AVG(convert(bigint, duration)) between 3001 and 4000 then 13
+			 when AVG(convert(bigint, duration)) > 4000 then 21 end
+		as duration_index,
+		case when count(*) < 500 then 0 
+		     when count(*) between 500 and 100 then 1 
+			 when count(*) between 1001 and 2000 then 2
+			 when count(*) between 2001 and 3000 then 3
+			 when count(*) between 3001 and 4000 then 5
+			 when count(*) between 4001 and 5000 then 8
+			 when count(*) > 5000 then 13 end
+		as requests_index
+	from	oslog_screen_previous
+	where	Application_Name not in ('service center')
+	group by application_name, screen
+)
+
+
+select	top 10 Application_Name, screen, qtd_requests, average_duration_ms, duration_index*requests_index as priority
+from	req_data
+where	application_name like '%%'
+order by 5 desc
+
