@@ -25,8 +25,12 @@ and		en.IS_ACTIVE = 1;
 ----------------------------------------------------------------------------------------------------------------------------
 --Feature toggle enabled in prod by age
 ----------------------------------------------------------------------------------------------------------------------------
+declare @devEnvKey varchar(50);
+declare @qaEnvKey varchar(50);
 declare @prodEnvKey varchar(50);
 
+set @devEnvKey = '6d3e0b55-8a34-49a6-8142-d7a0347ad1c3';
+set @qaEnvKey = '0cedda6b-24ad-49e7-8d8d-649217fb88ed';
 set @prodEnvKey = 'a5c43709-deec-4521-ab22-56f604153784';
 
 
@@ -46,45 +50,63 @@ ToggleCanaryDate as (
 			and		environmentKey = @prodEnvKey --getdate from prod environment		
 			and		AUDITTYPEID = 'CONFIGURATIONUPDATE' -- choose only configuration updates
 			and		CHANGEDESCRIPTION like '%restricted%'
-)
+),
+DevToggles as (
+			select	FEATURETOGGLEID, isOn as DEV_Activated, ISCONDITIONALON as DEV_CanaryRelease
+			from	OSUSR_s65_FeatureToggleConfiguration1
+			where	ENVIRONMENTKEY = @devEnvKey
+),
+QaToggles as (
+			select	FEATURETOGGLEID, isOn as QA_Activated, ISCONDITIONALON as QA_CanaryRelease
+			from	OSUSR_s65_FeatureToggleConfiguration1
+			where	ENVIRONMENTKEY = @qaEnvKey
+),
+ProdToggles as (
+			select	FEATURETOGGLEID, isOn as PROD_Activated, ISCONDITIONALON as PROD_CanaryRelease
+			from	OSUSR_s65_FeatureToggleConfiguration1
+			where	ENVIRONMENTKEY = @prodEnvKey
+) 
 
 select	ft.[KEY] as FeatureToggleKey, 
 		ft.name, 
 		ft.ISUNDERDEVELOPMENT, 
 		mt.REASON,
 		mt.DESCRIPTION,
-		mt.PredictedActivationDate,
 		mt.owner,
 		mt.USERSTORYURL,
 		STRING_AGG(tag.name, ',') as TAGS,
-		env.name as Environment_Name, 
-		ftc.ison as Environment_IsOn, 
-		ts.CREATEDON as Environment_StatusDate,
-		ftc.ISCONDITIONALON as Environment_CanaryRelease,
-		tcd.CREATEDON as Environment_CanaryReleaseDate
-from	OSUSR_s65_FeatureToggle1 ft inner join OSUSR_s65_FeatureToggleConfiguration1 ftc on (ftc.FEATURETOGGLEID = ft.[KEY])
-									inner join OSLTM_ENVIRONMENT env on (env.uid = ftc.ENVIRONMENTKEY)
-									inner join OSUSR_s65_FeatureToggleMetadata1 mt on (mt.featureToggleId = ft.[KEY])
+		dev.DEV_activated,
+		dev.DEV_CanaryRelease,
+		qa.QA_Activated,
+		qa.QA_CanaryRelease,
+		prod.PROD_Activated,
+		prod.PROD_CanaryRelease,
+		ts.CREATEDON as Prod_ActivatedDate,
+		CASE WHEN prod.PROD_CanaryRelease=0 THEN '' ELSE tcd.CREATEDON END as Prod_CanaryReleaseDate
+from	OSUSR_s65_FeatureToggle1 ft inner join DevToggles dev on (dev.FEATURETOGGLEID = ft.[KEY])
+									left join QaToggles qa on (qa.FEATURETOGGLEID = ft.[KEY])
+									left join ProdToggles prod on (prod.FEATURETOGGLEID = ft.[KEY])
+									left join OSUSR_s65_FeatureToggleMetadata1 mt on (mt.featureToggleId = ft.[KEY])
 									left join OSUSR_s65_FeatureToggleTag1 ftt on (ftt.featuretoggleID = ft.[KEY])
 									left join OSUSR_s65_Tag1 tag on (tag.id = ftt.tagid)
 									left join ToggleStatusDate ts on (ts.FEATURETOGGLEID = ft.[KEY] and ts.rnk = 1)
 									left join ToggleCanaryDate tcd on  (tcd.FEATURETOGGLEID = ft.[KEY] and tcd.rnk = 1)
 where	ft.ISACTIVE = 1 --only active feature toggles
-and		ft.ISUNDERDEVELOPMENT = 0 --feature toggle that are in production mode
-and		env.uid = @prodEnvKey
 group by ft.[KEY], 
 		ft.name, 
 		ft.ISUNDERDEVELOPMENT, 
 		mt.REASON,
 		mt.DESCRIPTION,
-		mt.PredictedActivationDate,
 		mt.owner,
 		mt.USERSTORYURL,
-		env.name, 
-		ftc.ison, 
+		dev.DEV_activated,
+		dev.DEV_CanaryRelease,
+		qa.QA_Activated,
+		qa.QA_CanaryRelease,
+		prod.PROD_Activated,
+		prod.PROD_CanaryRelease,
 		ts.CREATEDON,
-		ftc.ISCONDITIONALON,
-		tcd.CREATEDON
+		CASE WHEN prod.PROD_CanaryRelease=0 THEN '' ELSE tcd.CREATEDON END
 ;
 
 
