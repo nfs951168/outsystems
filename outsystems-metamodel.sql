@@ -2,7 +2,7 @@
 --Entity physical name and logical names
 -------------------------------------------------------------------------------------------------------------------------------------------------
 select	en.Id, en.name, 
-	en.PHYSICAL_TABLE_NAME, 
+	replace(d.name, '(Main)', 'outsystems') + '.dbo.' + en.PHYSICAL_TABLE_NAME as PhysicalTableName, 
 	en.is_system, en.data_kind, 
 	es.NAME as eSpaceName, 
 	app.NAME as ApplicationName, 
