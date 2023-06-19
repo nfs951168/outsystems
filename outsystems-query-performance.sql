@@ -2,6 +2,7 @@ use Outsystems;
 
 -----------------------------------------------------------------------------------------------------
 --1: Get all application logs into a temporary table
+--Warning: To be more performant should filter oslog_general tables by espace_ID
 -----------------------------------------------------------------------------------------------------
 
 --Get log from view with last week
@@ -163,32 +164,39 @@ INTO #TMP_PERFORMANCE_LOGS_FINAL
 FROM perf_logs
 WHERE (MIN_DURATION_RNK > 1 AND MAX_DURATION_RNK > 1)
  
- 
+
  
 -----------------------------------------------------------------------------------------------------
---3: Manage SlowSql logs
+--3: Get most expensive queries
 -----------------------------------------------------------------------------------------------------
  
-with performance as (
-select Application_Name, eSpace_Name, Query, count(1) as Executions, AVG(duration) as AverageDuration_ms, max(duration) as MaxDuration_ms, AVG(duration) * count(*) as row_weight
-from #TMP_PERFORMANCE_LOGS_FINAL
-where	1 = 1
---where InsTime between '7:00:00' and '21:00:00'
---and InstDate >= '2021-12-01'
-group by application_Name, eSpace_name, Query
+ --Get most relevant queries to be analysed
+with req_data as (
+	select	query, application_name, espace_name, action_name,  count(*) as qtd_requests, AVG(convert(bigint, duration)) as average_duration_ms, max(convert(bigint, duration)) max_duration_ms,
+	case when AVG(convert(bigint, duration)) < 500 then 0 
+		     when AVG(convert(bigint, duration)) between 500 and 800 then 2 
+			 when AVG(convert(bigint, duration)) between 801 and 1000 then 3
+			 when AVG(convert(bigint, duration)) between 1001 and 2000 then 5
+			 when AVG(convert(bigint, duration)) between 2001 and 3000 then 8
+			 when AVG(convert(bigint, duration)) between 3001 and 4000 then 13
+			 when AVG(convert(bigint, duration)) > 4000 then 21 end
+		as duration_index,
+		case when count(*) < 500 then 0 
+		     when count(*) between 500 and 100 then 1 
+			 when count(*) between 1001 and 2000 then 2
+			 when count(*) between 2001 and 3000 then 3
+			 when count(*) between 3001 and 4000 then 5
+			 when count(*) between 4001 and 5000 then 8
+			 when count(*) > 5000 then 13 end
+		as requests_index
+	from	#TMP_PERFORMANCE_LOGS_FINAL
+	group by query, application_name, espace_name, action_name
 )
- 
-select application_name, espace_name, query, executions, averageduration_ms, maxduration_ms, row_weight
-from	performance
-order by row_weight desc
 
 
---Extraction by day and hour
-select	Query, Application_Name, Espace_Name, InstDate as 'Day', datepart(hour, instant) as 'Hour', count(1) Executions, avg(duration) AverageDuration_ms
-from	#TMP_PERFORMANCE_LOGS_FINAL
-group by Query, Application_Name, Espace_Name, InstDate, datepart(hour, instant)
-order by 1, 4, 5
-
+select	top 20 query, application_name, espace_name, action_name, qtd_requests, average_duration_ms, duration_index*requests_index as priority
+from	req_data
+order by 7 desc
 
 -----------------------------------------------------------------------------------------------------
 --4: Get most executed queries
