@@ -229,5 +229,6 @@ select	min(mindate), max(maxdate)
 FROM	dates;
 
 
-select	*
+select	top 1 *
 from	#TMP_INTEGRATION_CALLS
+where	action = 'Webhook_17TRACK_API.UpdateTrackingDetails'
