@@ -2,7 +2,7 @@
 declare @espaceId as int;
 DECLARE @date_report as varchar(50);
 
-select @espaceID = id from ossys_espace where name = 'DF_TrackTrace_API'
+select @espaceID = id from ossys_espace where name = ''
 
 print @espaceId
 
