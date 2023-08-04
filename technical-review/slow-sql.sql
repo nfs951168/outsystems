@@ -1,7 +1,7 @@
 -----------------------------------------------------------------------------------------------------
 --Get all application logs into a temporary table
 -----------------------------------------------------------------------------------------------------
-select	*
+select	app.name, es.name, es.id, es.IS_ACTIVE
 from	ossys_espace es inner join ossys_module mo on (mo.espace_id = es.id)
 						inner join ossys_app_definition_module adm on (adm.module_id = mo.id)
                         inner join ossys_application app on (app.id = adm.application_id)
