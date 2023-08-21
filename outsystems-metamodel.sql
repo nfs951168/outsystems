@@ -17,7 +17,8 @@ from	ossys_Entity en inner join ossys_espace es on (es.id = en.ESPACE_ID)
 			left join ossys_dbcatalog d on (d.id = es.DBCatalog_Id)
 where	1 = 1
 --and		es.name like '%billing_cs%'
-and		en.IS_ACTIVE = 1;
+and		en.IS_ACTIVE = 1
+order by 2 asc;
 
 
 -------------------------------------------------------------------------------------------------------------------------------------------------
