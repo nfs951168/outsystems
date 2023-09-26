@@ -41,3 +41,19 @@ from	ossys_bpm_process pr inner join ossys_bpm_activity ac on (ac.Process_Id = p
 where	pd.espace_id IN (141, 140)
 and		pd.id = 86
 order by pr.id desc, ac.Precedent_Activity_Id asc
+
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------
+--Statistics 
+--Get number of activity records by process definition
+------------------------------------------------------------------------------------------------------------------------------------------------
+
+select	es.NAME as Espace_name, 
+		pd.id as process_def_id,
+		pd.name as Processname,
+		count(1) as qtd_activities
+from	ossys_bpm_activity ac with (nolock) inner join ossys_bpm_activity_definition ad with (nolock) on (ad.id = ac.Activity_Def_Id)
+											inner join ossys_bpm_process_definition pd with (nolock) on (pd.Id = ad.Process_Def_Id)
+											inner join ossys_Espace es with (nolock) on (es.id = pd.Espace_Id)
+group by es.NAME, pd.id, pd.name 
