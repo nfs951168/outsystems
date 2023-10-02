@@ -114,7 +114,7 @@ AND		U.IS_ACTIVE = 1
 
 
  ------------------------------------------------------------------------------------------------------------------------------------------------
---References: Get references of given module and object
+--References: Get references of given module and object (COUNTERS)
 --ossys_Espace_Reference: table with all references (producers and consumers)
 -------------------------------------------------------------------------------------------------------------------------------------------------
 select	top (1000) er.[producer_name] as [producer-name],
@@ -130,6 +130,27 @@ where	er.[producer_name] = 'outsystemsui'
 and	er.[name] like 'deprecated%'
 and	e.is_active = 1
 group by er.[producer_name], er.[producer_kind], e.[name], a.NAME
+
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------
+--References: Get references of given module and object
+--ossys_Espace_Reference: table with all references (producers and consumers)
+-------------------------------------------------------------------------------------------------------------------------------------------------
+select	top (1000) er.[producer_name] as [producer-name],
+		er.[producer_kind] as [producer-type], 
+		er.name as [reference-name],
+		e.[name] as [consumer-name], 
+		a.NAME as [application-name]		
+from	ossys_espace_reference er	inner join ossys_espace e on (e.version_id = er.consumer_version_id)
+									inner join ossys_module m on (m.espace_id = e.id)
+									inner join ossys_app_definition_module adm on (adm.module_id = m.id)
+									inner join ossys_application a on (a.id = adm.application_id)
+where	1 = 1 
+and	er.[producer_name] = 'ServiceCenter'
+and	er.[name] like 'process'
+and	e.is_active = 1
+
 
 
 -------------------------------------------------------------------------------------------------------------------------------------------------
