@@ -1,19 +1,10 @@
------------------------------------------------------------------------------------------------------
---Get all application logs into a temporary table
------------------------------------------------------------------------------------------------------
-select	app.name, es.name, es.id, es.IS_ACTIVE
-from	ossys_espace es inner join ossys_module mo on (mo.espace_id = es.id)
-						inner join ossys_app_definition_module adm on (adm.module_id = mo.id)
-                        inner join ossys_application app on (app.id = adm.application_id)
-where	app.name like ''
-
 
 -----------------------------------------------------------------------------------------------------------------------------------------------------------
 --performance statistics | integrations
 -----------------------------------------------------------------------------------------------------------------------------------------------------------
 SELECT	convert(date, instant, 102) as [day],
 		datepart(HOUR, instant) as [hour], 
-		Executed_by as [Server],
+		espace_id,
 		Application_Name, 
 		Espace_Name, 
 		Endpoint, 
@@ -23,7 +14,7 @@ SELECT	convert(date, instant, 102) as [day],
 		error_id
 INTO	#RPT_OUTSYSTEMS_PERF_INTEGRATIONS
 FROM	oslog_Integration with (nolock)
-where	espace_id IN (385, 386, 387, 388, 389, 390, 391, 392, 393, 394, 395, 396, 397, 398, 399, 400, 401, 402, 403, 404, 405, 406, 407, 408, 409, 410, 411, 412, 413, 414, 415, 416)
+where	1 = 1
 and		instant > dateadd(day,-15,getdate());
 
 
@@ -31,7 +22,7 @@ and		instant > dateadd(day,-15,getdate());
 INSERT INTO	#RPT_OUTSYSTEMS_PERF_INTEGRATIONS
 SELECT	convert(date, instant, 102) as [day],
 		datepart(HOUR, instant) as [hour], 
-		Executed_by as [Server],
+		espace_id,
 		Application_Name, 
 		Espace_Name, 
 		Endpoint, 
@@ -40,7 +31,7 @@ SELECT	convert(date, instant, 102) as [day],
 		duration,
 		error_id
 FROM	oslog_Integration_previous with (nolock)
-where	espace_id IN (385, 386, 387, 388, 389, 390, 391, 392, 393, 394, 395, 396, 397, 398, 399, 400, 401, 402, 403, 404, 405, 406, 407, 408, 409, 410, 411, 412, 413, 414, 415, 416)
+where	1 = 1
 and		instant > dateadd(day,-15,getdate());
 
 
@@ -56,7 +47,7 @@ from	#RPT_OUTSYSTEMS_PERF_INTEGRATIONS;
 
 
 with req_data as (
-	select	espace_name, type, action,  count(*) as qtd_requests, AVG(convert(bigint, duration)) as average_duration_ms, max(convert(bigint, duration)) max_duration_ms,
+	select	espace_id, espace_name, type, action,  count(*) as qtd_requests, AVG(convert(bigint, duration)) as average_duration_ms, max(convert(bigint, duration)) max_duration_ms,
 	SUM(CASE WHEN error_id = '' THEN 0 ELSE 1 END) AS qtd_errors,
 	case when AVG(convert(bigint, duration)) < 500 then 0 
 		     when AVG(convert(bigint, duration)) between 500 and 800 then 2 
@@ -75,10 +66,19 @@ with req_data as (
 			 when count(*) > 5000 then 21 end
 		as requests_index
 	from	#RPT_OUTSYSTEMS_PERF_INTEGRATIONS
-	group by espace_name, type, action
+	group by espace_id, espace_name, type, action
 )
 
 
-select	@date_report as data_report, espace_name, type, action, qtd_requests, average_duration_ms, qtd_errors, duration_index*requests_index as priority
-from	req_data
-order by 8 desc
+select	@date_report as data_report, t.domain, espace_name, type, action, qtd_requests, average_duration_ms, qtd_errors, duration_index*requests_index as priority
+from	req_data as l	LEFT JOIN [dbo].[OSSYS_MODULE] m ON m.ESPACE_ID = l.espace_id
+						LEFT JOIN [dbo].[OSSYS_APP_DEFINITION_MODULE] adm ON adm.MODULE_ID = m.ID
+						LEFT JOIN [dbo].[OSSYS_APPLICATION] app ON app.ID = adm.APPLICATION_ID
+						LEFT JOIN #tmp_domains t on t.application = app.NAME
+order by 9 desc
+
+
+
+
+
+

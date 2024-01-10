@@ -1,12 +1,3 @@
------------------------------------------------------------------------------------------------------
---Get all application logs into a temporary table
------------------------------------------------------------------------------------------------------
-select	app.name, es.name, es.id, es.IS_ACTIVE
-from	ossys_espace es inner join ossys_module mo on (mo.espace_id = es.id)
-						inner join ossys_app_definition_module adm on (adm.module_id = mo.id)
-                        inner join ossys_application app on (app.id = adm.application_id)
-where	app.name like '%%'
-
 
 
 --Get log from view with last week
@@ -18,14 +9,13 @@ select	convert(date, lg.instant) InstDate,
 		lg.Message,
 		lg.Action_Name,
 		lg.Entrypoint_Name,
-		--ltrim(replace(left(lg.message, patindex ('%[0-9]%', lg.message)-6), 'Query', '')) as Query,
+		lg.espace_id,
 		substring(message, 0, charindex(' took ', message, 0)) as Query,
 		cast(substring(lg.message, charindex(' took ', lg.message, 0) + 6, charindex(' ms', lg.Message, 0) - 6 - charindex(' took ', lg.message, 0)) as int) duration
 into	#RPT_OUTSYSTEMS_PERF_SLOW
 from	oslog_General lg with (nolock)
 where	lg.module_name = 'SLOWSQL'
-and		espace_id IN (373, 374, 375, 376, 377)
-and		instant > dateadd(day,-15,getdate());
+and		instant > dateadd(day,-30,getdate());
  
 
 insert into #RPT_OUTSYSTEMS_PERF_SLOW
@@ -37,12 +27,12 @@ select	convert(date, lg.instant) InstDate,
 		lg.Message,
 		lg.Action_Name,
 		lg.Entrypoint_Name,
+		lg.espace_id,
 		substring(message, 0, charindex(' took ', message, 0)) as Query,
 		cast(substring(lg.message, charindex(' took ', lg.message, 0) + 6, charindex(' ms', lg.Message, 0) - 6 - charindex(' took ', lg.message, 0)) as int) duration
 from	oslog_General_previous lg with (nolock)
 where	lg.module_name = 'SLOWSQL'
-and		espace_id IN (373, 374, 375, 376, 377)
-and		instant > dateadd(day,-15,getdate());
+and		instant > dateadd(day,-30,getdate());
 
 
 -----------------------------------------------------------------------------------------------------
@@ -54,7 +44,7 @@ select	@date_report = cast(min(InstDate) as varchar) + ' a ' + cast(max(InstDate
 from	#RPT_OUTSYSTEMS_PERF_SLOW;
 
 with req_data as (
-	select	query, application_name, espace_name, action_name,  count(*) as qtd_requests, AVG(convert(bigint, duration)) as average_duration_ms, max(convert(bigint, duration)) max_duration_ms,
+	select	query, application_name, espace_id, espace_name, action_name,  count(*) as qtd_requests, AVG(convert(bigint, duration)) as average_duration_ms, max(convert(bigint, duration)) max_duration_ms,
 	case when AVG(convert(bigint, duration)) < 500 then 0 
 		     when AVG(convert(bigint, duration)) between 500 and 800 then 2 
 			 when AVG(convert(bigint, duration)) between 801 and 1000 then 3
@@ -72,12 +62,15 @@ with req_data as (
 			 when count(*) > 5000 then 13 end
 		as requests_index
 	from	#RPT_OUTSYSTEMS_PERF_SLOW
-	group by query, application_name, espace_name, action_name
+	group by query, application_name, espace_id, espace_name, action_name
 )
 
 
-select	@date_report as data_report, query, application_name, espace_name, action_name, qtd_requests, average_duration_ms, duration_index*requests_index as priority
-from	req_data
-order by 8 desc
+select	@date_report as data_report, t.domain as Domain, application_name, espace_name, query, action_name, qtd_requests, average_duration_ms, duration_index*requests_index as priority
+from	req_data as l	LEFT JOIN [dbo].[OSSYS_MODULE] m ON m.ESPACE_ID = l.espace_id
+						LEFT JOIN [dbo].[OSSYS_APP_DEFINITION_MODULE] adm ON adm.MODULE_ID = m.ID
+						LEFT JOIN [dbo].[OSSYS_APPLICATION] app ON app.ID = adm.APPLICATION_ID
+						LEFT JOIN #tmp_domains t on t.application = app.NAME
+order by 9 desc
 
 
