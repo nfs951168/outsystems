@@ -1,11 +1,41 @@
 ------------------------------------------------------------------------------------------------------------------------------
---Gets all SOAP exposed webservices
+--Integrations metadata
 ------------------------------------------------------------------------------------------------------------------------------
-select	'soap' as type, es.name, ws.name, ws.internal_access, ws.secure_connection, ws.integrated_authentication
-from	ossys_Web_Service ws inner join ossys_espace es on (es.id = ws.espace_id)
-where	es.is_active = 1
-and		ws.is_active = 1
-and		es.is_system = 0 -- exclude systems services
+
+--SOAP Consume
+SELECT 	ossys_espace.name,
+		OSSYS_SOAP_CONSUME.URL,
+		OSSYS_SOAP_CONSUME.EFFECTIVE_URL
+FROM 	OSSYS_SOAP_CONSUME INNER JOIN ossys_espace ON ossys_espace.ID = OSSYS_SOAP_CONSUME.ESPACE_ID
+WHERE	OSSYS_SOAP_CONSUME.IS_ACTIVE = 1
+UNION ALL
+SELECT	ossys_espace.name,
+		OSSYS_WEB_REFERENCE.URL,
+		OSSYS_WEB_REFERENCE.EFFECTIVE_URL
+FROM 	OSSYS_WEB_REFERENCE INNER JOIN ossys_espace ON ossys_espace.ID = OSSYS_WEB_REFERENCE.ESPACE_ID
+WHERE  	OSSYS_WEB_REFERENCE.IS_ACTIVE = 1
+
+
+--REST Consume
+SELECT 	ossys_espace.name,
+		OSSYS_REST_WEB_REFERENCE.URL,
+		OSSYS_REST_WEB_REFERENCE.EFFECTIVE_URL
+FROM 	OSSYS_REST_WEB_REFERENCE INNER JOIN ossys_espace ON ossys_espace.ID = OSSYS_REST_WEB_REFERENCE.ESPACE_ID
+WHERE 	OSSYS_REST_WEB_REFERENCE.IS_ACTIVE = 1
+
+
+--SOAP Exposed
+SELECT 	ossys_espace.name,
+		OSSYS_WEB_SERVICE.NAME AS WS_NAME
+FROM	OSSYS_WEB_SERVICE INNER JOIN ossys_espace ON ossys_espace.ID = OSSYS_WEB_SERVICE.ESPACE_ID
+WHERE  	OSSYS_WEB_SERVICE.IS_ACTIVE = 1
+
+--REST Exposed
+SELECT 	ossys_espace.name,
+		ossys_REST_Expose.NAME AS WS_NAME
+FROM 	ossys_REST_Expose INNER JOIN ossys_espace ON ossys_espace.ID = ossys_REST_Expose.ESPACE_ID
+WHERE 	ossys_REST_Expose.IS_ACTIVE = 1
+
 
 
 
