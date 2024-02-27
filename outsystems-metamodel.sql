@@ -119,19 +119,18 @@ AND		U.IS_ACTIVE = 1
 --References: Get references of given module and object (COUNTERS)
 --ossys_Espace_Reference: table with all references (producers and consumers)
 -------------------------------------------------------------------------------------------------------------------------------------------------
-select	top (1000) er.[producer_name] as [producer-name],
-		er.[producer_kind] as [producer-type], 
-		e.[name] as [consumer-name], 
-		a.NAME as [application-name],
-		count(1) as [references-count]
+select	er.name as reference_name,
+		er.[producer_name] as producer_name,
+		er.[producer_kind] as producer_type, 
+		e.[name] as consumer_name, 
+		a.NAME as application_name
 from	ossys_espace_reference er	inner join ossys_espace e on (e.version_id = er.consumer_version_id)
 									inner join ossys_module m on (m.espace_id = e.id)
 									inner join ossys_app_definition_module adm on (adm.module_id = m.id)
 									inner join ossys_application a on (a.id = adm.application_id)
-where	er.[producer_name] = 'outsystemsui'
-and	er.[name] like 'deprecated%'
+where	1= 1
+and	er.[name] like '%iban%'
 and	e.is_active = 1
-group by er.[producer_name], er.[producer_kind], e.[name], a.NAME
 
 
 
