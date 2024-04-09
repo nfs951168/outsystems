@@ -113,24 +113,25 @@ AND		R.IS_ACTIVE = 1
 AND		U.IS_ACTIVE = 1
 
 
-
-
- ------------------------------------------------------------------------------------------------------------------------------------------------
---References: Get references of given module and object (COUNTERS)
+------------------------------------------------------------------------------------------------------------------------------------------------
+--References: Get references of given module and object
 --ossys_Espace_Reference: table with all references (producers and consumers)
 -------------------------------------------------------------------------------------------------------------------------------------------------
-select	er.name as reference_name,
-		er.[producer_name] as producer_name,
-		er.[producer_kind] as producer_type, 
-		e.[name] as consumer_name, 
-		a.NAME as application_name
+select	top (1000) 
+	er.name as ObjectName,
+	er.kind,
+	er.[producer_name] as [producer-name],
+	er.[producer_kind] as [producer-type], 
+	e.[name] as [consumer-name], 
+	a.NAME as [application-name]		
 from	ossys_espace_reference er	inner join ossys_espace e on (e.version_id = er.consumer_version_id)
-									inner join ossys_module m on (m.espace_id = e.id)
-									inner join ossys_app_definition_module adm on (adm.module_id = m.id)
-									inner join ossys_application a on (a.id = adm.application_id)
-where	1= 1
-and	er.[name] like '%iban%'
+					inner join ossys_module m on (m.espace_id = e.id)
+					inner join ossys_app_definition_module adm on (adm.module_id = m.id)
+					inner join ossys_application a on (a.id = adm.application_id)
+where	1 = 1 
 and	e.is_active = 1
+and	er.KIND = 'ServiceAPIMethod'
+
 
 
 
