@@ -12,7 +12,7 @@ select	pd.Id As ProcessId,
 		ak.Name as Activity_Kind,
 		ac.is_active as Asctivity_IsActive, ac.*
 from	ossys_bpm_process_definition pd inner join ossys_bpm_activity_definition ac on (ac.Process_Def_Id = pd.Id)
-										inner join ossys_BPM_Activity_Kind ak on (ak.id = ac.Kind)
+				        inner join ossys_BPM_Activity_Kind ak on (ak.id = ac.Kind)
 where	pd.espace_id IN (141, 140)
 order by pd.name asc, ac.Display_Y asc
 
@@ -36,8 +36,8 @@ select	top 100 pr.id as ProcessId,
 		ac.Error_Count as Activity_ErrorCount,
 		ac.Precedent_Activity_Id
 from	ossys_bpm_process pr inner join ossys_bpm_activity ac on (ac.Process_Id = pr.id)
-							 inner join ossys_bpm_process_definition pd on (pd.id = pr.process_def_id)
-							 inner join ossys_BPM_Activity_Status ast on (ast.id = ac.Status_Id)
+			     inner join ossys_bpm_process_definition pd on (pd.id = pr.process_def_id)
+		 	     inner join ossys_BPM_Activity_Status ast on (ast.id = ac.Status_Id)
 where	pd.espace_id IN (141, 140)
 and		pd.id = 86
 order by pr.id desc, ac.Precedent_Activity_Id asc
@@ -54,6 +54,6 @@ select	es.NAME as Espace_name,
 		pd.name as Processname,
 		count(1) as qtd_activities
 from	ossys_bpm_activity ac with (nolock) inner join ossys_bpm_activity_definition ad with (nolock) on (ad.id = ac.Activity_Def_Id)
-											inner join ossys_bpm_process_definition pd with (nolock) on (pd.Id = ad.Process_Def_Id)
-											inner join ossys_Espace es with (nolock) on (es.id = pd.Espace_Id)
+					    inner join ossys_bpm_process_definition pd with (nolock) on (pd.Id = ad.Process_Def_Id)
+					    inner join ossys_Espace es with (nolock) on (es.id = pd.Espace_Id)
 group by es.NAME, pd.id, pd.name 
