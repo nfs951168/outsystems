@@ -1,5 +1,6 @@
 ----------------------------------------------------------------------------------------------------------------------------
 --Feature toggle enabled in prod by age
+--Note in your lifetime environment feature toggle tables can have a diferent prefix
 ----------------------------------------------------------------------------------------------------------------------------
 declare @devEnvKey varchar(50);
 declare @qaEnvKey varchar(50);
