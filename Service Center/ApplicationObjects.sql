@@ -57,9 +57,9 @@ application nvarchar(400) COLLATE Latin1_General_CI_AI
 with AO as (
 			select	es.id, es.name as ModuleName, app.name as ApplicationName, do.domain, su.OMLCOMPLEXITY as ApplicationObjects
 			from	OSSYS_REPORT_SU su inner join ossys_espace es on (es.id = su.espaceid)
-										inner join ossys_module mo on (mo.espace_id = es.id)
-										inner join ossys_app_definition_module adm on (adm.module_id = mo.id)
-										inner join ossys_application app on (app.id = adm.application_id)
+										left join ossys_module mo on (mo.espace_id = es.id)
+										left join ossys_app_definition_module adm on (adm.module_id = mo.id)
+										left join ossys_application app on (app.id = adm.application_id)
 										left join #tmp_domains do on (do.application = app.name)
 			where	es.is_active = 1
 			and		is_system = 0
@@ -69,5 +69,6 @@ with AO as (
 select	ApplicationName, domain, sum(applicationObjects) as ApplicationObjects
 from	AO
 group by ApplicationName, domain
+order by 1 desc
 
 
