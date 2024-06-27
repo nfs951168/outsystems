@@ -79,3 +79,22 @@ CREATE TABLE [dbo].[RPT_OUTSYSTEMS_PERF_SLOWSQL](
 	[max_duration_ms] [int] NULL
 ) ON [PRIMARY]
 GO
+
+
+--------------------------------------------------------------------------------------------------------------------------
+--RPT_OUTSYSTEMS_PERF_SERVICE: Service actions statistics
+--------------------------------------------------------------------------------------------------------------------------
+CREATE TABLE [dbo].[RPT_OUTSYSTEMS_PERF_SERVICE](
+	[day] [date] NULL,
+	[hour] [int] NULL,
+	[server] [nvarchar](50) NULL,
+	[application_name] [nvarchar](50) NULL,
+	[espace_name] [nvarchar](50) NULL,
+	[endpoint] [nvarchar](200) NULL,
+	[action_name] [nvarchar](60) NULL,
+	[requests] [int] NULL,
+	[avg_duration_ms] [int] NULL,
+	[min_duration_ms] [int] NULL,
+	[max_duration_ms] [int] NULL
+) ON [PRIMARY]
+GO
