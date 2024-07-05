@@ -27,7 +27,6 @@ select	object_id,
 		es.IS_ACTIVE as eSpaceIsActive
 from	usage u left join ossys_entity e on (e.PHYSICAL_TABLE_NAME = u.object_name)
 				left join ossys_espace es on (es.id = e.espace_id)
-order by 6 asc, 7 asc
-
-
-
+where	(SELECT MAX(SelectDate) from (values (last_user_scan), (last_user_lookup), (last_user_seek))alias(SelectDate)) is null
+and		last_user_update is null
+order by 6 asc
