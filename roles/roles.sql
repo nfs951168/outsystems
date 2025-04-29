@@ -7,7 +7,7 @@ declare @Username varchar(100);
 declare @TenantId int;
 declare @UserId int;
 
-SET		@Username = 'nuno.felixfernandes@ageas.pt'
+SET		@Username = 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXx'
 
 --Get Tenant
 select	@TenantId = Id
