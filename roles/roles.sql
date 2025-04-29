@@ -32,3 +32,48 @@ and		tenant_Id = @TenantId
 						inner join ossys_Role r on (r.id = ur.role_id)
 						inner join ossys_espace e on (e.id = r.ESPACE_ID)
  where  u.ID = @UserId;
+
+
+
+-------------------------------------------------------------------------------------------------------------------------------------------------
+--ROLES: User role direct assign or via group
+
+--ossys_user_effective_role: Read-only view containing user specific roles (either direct or via user groups).
+-------------------------------------------------------------------------------------------------------------------------------------------------
+--direct roles assigned
+SELECT	UR.USER_ID [USERID],
+		U.USERNAME,
+		UR.ROLE_ID [ROLEID],
+		R.NAME  [ROLENAME],
+		R.ESPACE_ID [ESPACE_ID],
+		A.NAME [APP_NAME],
+		E.NAME [MODULE_NAME]
+FROM	[OSSYS_USER_ROLE] UR INNER JOIN [OSSYS_ROLE] R ON (R.ID = UR.ROLE_ID)
+							 LEFT JOIN OSSYS_ESPACE E ON E.ID = R.ESPACE_ID
+							 LEFT JOIN OSSYS_MODULE M ON M.ESPACE_ID = E.ID
+							 LEFT JOIN OSSYS_APP_DEFINITION_MODULE ADM ON M.ID = ADM.MODULE_ID
+							 LEFT JOIN OSSYS_APPLICATION A ON A.ID = ADM.APPLICATION_ID
+							 INNER JOIN  OSSYS_USER U ON (U.ID = UR.USER_ID)
+WHERE	A.IS_ACTIVE = 1
+AND		R.IS_ACTIVE = 1
+AND		U.IS_ACTIVE = 1;
+
+
+--roles assigned by group assignment
+SELECT	GU.USER_ID [USERID], 
+		U.USERNAME,
+		R.ID [ROLEID],
+		R.NAME [ROLENAME],
+		R.ESPACE_ID [ESPACE_ID],
+		A.NAME [APP_NAME],
+		E.NAME [MODULE_NAME]
+FROM	[OSSYS_GROUP_ROLE] GR INNER JOIN [OSSYS_ROLE] R ON R.ID = GR.ROLE_ID
+							  INNER JOIN [OSSYS_GROUP_USER] GU ON GU.GROUP_ID = GR.GROUP_ID
+							  LEFT JOIN OSSYS_ESPACE E ON E.ID = R.ESPACE_ID
+							  LEFT JOIN OSSYS_MODULE M ON M.ESPACE_ID = E.ID
+							  LEFT JOIN OSSYS_APP_DEFINITION_MODULE ADM ON M.ID = ADM.MODULE_ID
+							  LEFT JOIN OSSYS_APPLICATION A ON A.ID = ADM.APPLICATION_ID
+							  INNER JOIN OSSYS_USER U ON (U.ID = GU.USER_ID)
+WHERE	A.IS_ACTIVE = 1
+AND		R.IS_ACTIVE = 1
+AND		U.IS_ACTIVE = 1
