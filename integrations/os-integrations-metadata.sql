@@ -31,10 +31,10 @@ FROM	OSSYS_WEB_SERVICE INNER JOIN ossys_espace ON ossys_espace.ID = OSSYS_WEB_SE
 WHERE  	OSSYS_WEB_SERVICE.IS_ACTIVE = 1
 
 --REST Exposed
-SELECT 	ossys_espace.name,
-		ossys_REST_Expose.NAME AS WS_NAME
-FROM 	ossys_REST_Expose INNER JOIN ossys_espace ON ossys_espace.ID = ossys_REST_Expose.ESPACE_ID
-WHERE 	ossys_REST_Expose.IS_ACTIVE = 1
+SELECT 	e.name, re.NAME, re.url, re.name, re.TRACEERRORS, re.TRACEALL
+FROM 	ossys_REST_Expose re INNER JOIN ossys_espace e ON e.ID = re.ESPACE_ID
+WHERE 	re.IS_ACTIVE = 1
+
 
 
 
