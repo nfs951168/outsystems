@@ -1,4 +1,27 @@
 ------------------------------------------------------------------------------------------------------------------------------
+--Get integrations with full logging
+------------------------------------------------------------------------------------------------------------------------------
+SELECT 	'SOAP Consume' as Type, es.name as eSpaceName, sc.name as IntegrationName, sc.traceall
+FROM 	OSSYS_SOAP_CONSUME sc INNER JOIN ossys_espace es ON es.ID = sc.ESPACE_ID
+WHERE	sc.IS_ACTIVE = 1
+AND		sc.traceall = 1
+AND		es.is_active = 1
+UNION ALL
+SELECT 	'REST Consume' as Type, es.name as eSpaceName, re.name as IntegrationName, re.TRACEALL
+FROM 	OSSYS_REST_WEB_REFERENCE re INNER JOIN ossys_espace es ON es.ID = re.ESPACE_ID
+WHERE 	re.IS_ACTIVE = 1
+AND		es.IS_ACTIVE = 1
+and		re.traceall = 1
+UNION ALL
+--REST Exposed
+SELECT 	'REST Exposed' as Type, e.name as eSpaceName, re.NAME as IntegrationName, re.TRACEALL
+FROM 	ossys_REST_Expose re INNER JOIN ossys_espace e ON e.ID = re.ESPACE_ID
+WHERE 	re.IS_ACTIVE = 1
+AND		e.Is_ACTIVE = 1
+AND		re.TraceAll = 1
+ 
+
+------------------------------------------------------------------------------------------------------------------------------
 --Integrations metadata
 ------------------------------------------------------------------------------------------------------------------------------
 
