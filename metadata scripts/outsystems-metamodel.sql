@@ -23,6 +23,7 @@ and		en.IS_ACTIVE = 1
 order by 2 asc;
 
 
+
 -------------------------------------------------------------------------------------------------------------------------------------------------
 --Site Properties: Get site properties values by application
 
@@ -34,7 +35,8 @@ order by 2 asc;
 --App_Definition_Module: Modules for a specific application definition.
 --Application: Applications in this environment. Old applications are kept as inactive
 -------------------------------------------------------------------------------------------------------------------------------------------------
-select  app.name as ApplicationName,
+select  app.Id ApplicationID,
+	app.name as ApplicationName,
         app.description as ApplicationDesc,
         es.name as eSpaceName,
         spd.name as SitepropertyName,
@@ -51,7 +53,7 @@ from    ossys_site_property_definition spd  inner join ossys_espace es on (es.id
                                             left join ossys_site_property sp on (sp.site_property_definition_id = sp.id)
 where   spd.is_active = 1 --only active site properties
 and     es.is_active = 1 --only active espaces
-and     app.name = 'xxxxxxx'
+and	app.id not in (2,3,5,6,7) --Service center, system components, app feedback, users, EPA
 
 
 ------------------------------------------------------------------------------------------------------------------------------------------------
