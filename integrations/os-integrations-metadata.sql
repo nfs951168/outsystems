@@ -38,23 +38,24 @@ SELECT	ossys_espace.name,
 FROM 	OSSYS_WEB_REFERENCE INNER JOIN ossys_espace ON ossys_espace.ID = OSSYS_WEB_REFERENCE.ESPACE_ID
 WHERE  	OSSYS_WEB_REFERENCE.IS_ACTIVE = 1
 
-
 --REST Consume
 --REST Consume
 SELECT 	e.name,
-		wr.URL,
-		wr.EFFECTIVE_URL
+	wr.URL,
+	wr.EFFECTIVE_URL
 FROM 	OSSYS_REST_WEB_REFERENCE wr INNER JOIN ossys_espace as e ON e.ID = wr.ESPACE_ID
 WHERE 	wr.IS_ACTIVE = 1
-and		(wr.EFFECTIVE_URL like '%-dv%' or wr.EFFECTIVE_URL like '%-ts%' or wr.EFFECTIVE_URL like '%-pp%' or wr.EFFECTIVE_URL like '%-mt%')
+and	e.is_active = 1
+and	(wr.EFFECTIVE_URL like '%-dv%' or wr.EFFECTIVE_URL like '%-ts%' or wr.EFFECTIVE_URL like '%-pp%' or wr.EFFECTIVE_URL like '%-mt%')
 union all
 SELECT 	e.name,
-		wr.URL,
-		wr.EFFECTIVE_URL
+	wr.URL,
+	wr.EFFECTIVE_URL
 FROM 	OSSYS_REST_WEB_REFERENCE wr INNER JOIN ossys_espace as e ON e.ID = wr.ESPACE_ID
 WHERE 	wr.IS_ACTIVE = 1
-and		wr.effective_url = ''
-and		(wr.url like '%-dv%' or wr.url like '%-ts%' or wr.url like '%-pp%' or wr.url like '%-mt%')
+and	e.is_active = 1
+and	wr.effective_url = ''
+and	(wr.url like '%-dv%' or wr.url like '%-ts%' or wr.url like '%-pp%' or wr.url like '%-mt%')
 	
 
 
