@@ -22,32 +22,19 @@ AND		re.TraceAll = 1
  
 
 ------------------------------------------------------------------------------------------------------------------------------
---Integrations metadata
+--Validate if there are services in prod with non production url (REST)
 ------------------------------------------------------------------------------------------------------------------------------
 
---SOAP Consume
-SELECT 	ossys_espace.name,
-		OSSYS_SOAP_CONSUME.URL,
-		OSSYS_SOAP_CONSUME.EFFECTIVE_URL
-FROM 	OSSYS_SOAP_CONSUME INNER JOIN ossys_espace ON ossys_espace.ID = OSSYS_SOAP_CONSUME.ESPACE_ID
-WHERE	OSSYS_SOAP_CONSUME.IS_ACTIVE = 1
-UNION ALL
-SELECT	ossys_espace.name,
-		OSSYS_WEB_REFERENCE.URL,
-		OSSYS_WEB_REFERENCE.EFFECTIVE_URL
-FROM 	OSSYS_WEB_REFERENCE INNER JOIN ossys_espace ON ossys_espace.ID = OSSYS_WEB_REFERENCE.ESPACE_ID
-WHERE  	OSSYS_WEB_REFERENCE.IS_ACTIVE = 1
-
---REST Consume
---REST Consume
+--EfectiveURL validations
 SELECT 	e.name,
 	wr.URL,
 	wr.EFFECTIVE_URL
 FROM 	OSSYS_REST_WEB_REFERENCE wr INNER JOIN ossys_espace as e ON e.ID = wr.ESPACE_ID
 WHERE 	wr.IS_ACTIVE = 1
 and	e.is_active = 1
-and	(wr.EFFECTIVE_URL like '%-dv%' or wr.EFFECTIVE_URL like '%-ts%' or wr.EFFECTIVE_URL like '%-pp%' or wr.EFFECTIVE_URL like '%-mt%')
+and	(wr.EFFECTIVE_URL like '%-dv%' or wr.EFFECTIVE_URL like '%-ts%' or wr.EFFECTIVE_URL like '%-pp%' or wr.EFFECTIVE_URL like '%-mt%' or wr.EFFECTIVE_URL like '%servicenp%')
 union all
+--Default url validation
 SELECT 	e.name,
 	wr.URL,
 	wr.EFFECTIVE_URL
@@ -55,10 +42,12 @@ FROM 	OSSYS_REST_WEB_REFERENCE wr INNER JOIN ossys_espace as e ON e.ID = wr.ESPA
 WHERE 	wr.IS_ACTIVE = 1
 and	e.is_active = 1
 and	wr.effective_url = ''
-and	(wr.url like '%-dv%' or wr.url like '%-ts%' or wr.url like '%-pp%' or wr.url like '%-mt%')
+and	(wr.url like '%-dv%' or wr.url like '%-ts%' or wr.url like '%-pp%' or wr.url like '%-mt%' or wr.url like '%servicenp%')
 	
 
-
+------------------------------------------------------------------------------------------------------------------------------
+--SOAP and REST exposed info
+------------------------------------------------------------------------------------------------------------------------------
 --SOAP Exposed
 SELECT 	ossys_espace.name,
 		OSSYS_WEB_SERVICE.NAME AS WS_NAME
